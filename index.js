@@ -1,13 +1,13 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
-
+const cors = require('cors')
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
-
+app.use(cors());
 // Initialize the Supabase client
 const supabaseUrl = process.env.SUPABASE_URL; // Your Supabase project URL
 console.log(supabaseUrl);
