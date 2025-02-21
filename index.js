@@ -15,7 +15,7 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY; // Your Supabase anon/public 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.post('/update', async (req, res) => {
-  const { email, phone_no, username, password, pass, college_name } = req.body;
+  const { email, phone_no, username, password, pass, college_name , amount , count} = req.body;
 
   // Validate that 'pass' is a 2D array
   if (!Array.isArray(pass) || !pass.every(row => Array.isArray(row))) {
@@ -26,7 +26,7 @@ app.post('/update', async (req, res) => {
   const { data, error } = await supabase
     .from('users')
     .insert([
-      { email, phone_no, username, password, pass, college_name }
+      { email, phone_no, username, password, pass, college_name, amount, count }
     ])
     .select();
 
