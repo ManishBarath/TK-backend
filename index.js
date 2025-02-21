@@ -20,47 +20,35 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 console.log(`Supabase URL: ${supabaseUrl}`);
 console.log(`Supabase Key: ${supabaseKey ? 'Loaded' : 'Missing'}`);
 
-// POST route to insert a user
+// POST route to insert or update a user
 app.post('/update', async (req, res) => {
-<<<<<<< Updated upstream
   console.log('Incoming Request:', req.body);
 
-=======
->>>>>>> Stashed changes
   const { email, phone_no, username, password, pass, college_name, amount, count } = req.body;
 
+  // Validate that 'pass' is a 2D array
   if (!Array.isArray(pass) || !pass.every(row => Array.isArray(row))) {
     console.error('Validation Error: pass must be a 2D array');
     return res.status(400).json({ error: 'pass must be a 2D array' });
   }
 
-<<<<<<< Updated upstream
-  console.log('Inserting user with data:', { email, phone_no, username, college_name, amount, count });
+  console.log('Upserting user with data:', { email, phone_no, username, college_name, amount, count });
 
-  const { data, error } = await supabase
-    .from('users')
-    .insert([{ email, phone_no, username, password, pass, college_name, amount, count }])
-    .select();
-
-  if (error) {
-    console.error('Supabase Insert Error:', error);
-    return res.status(500).json({ error: 'Internal server error', details: error });
-=======
   // Upsert the user into the database
   const { data, error } = await supabase
     .from('users')
-    .upsert([
-      { email, phone_no, username, password, pass, college_name, amount, count }
-    ], { onConflict: 'phone_no' }) // Specify the primary key column
+    .upsert(
+      [{ email, phone_no, username, password, pass, college_name, amount, count }],
+      { onConflict: 'phone_no' } // Specify the primary key column
+    )
     .select();
 
   if (error) {
-    console.error('Error upserting user:', error);
-    return res.status(500).json({ error: 'Internal server error' });
->>>>>>> Stashed changes
+    console.error('Supabase Upsert Error:', error);
+    return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 
-  console.log('Insert Success:', data);
+  console.log('Upsert Success:', data);
   res.status(201).json(data[0]);
 });
 
@@ -72,7 +60,7 @@ app.get('/select', async (req, res) => {
 
   if (error) {
     console.error('Supabase Fetch Error:', error);
-    return res.status(500).json({ error: 'Internal server error', details: error });
+    return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 
   console.log('Fetched Users:', data);
