@@ -48,8 +48,11 @@ app.get('/select', async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
   res.status(200).json(data);
-});
 
+});
+app.get('/',(req,res)=>{
+  res.json("Vanakam da mappla")
+})
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
