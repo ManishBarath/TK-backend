@@ -22,8 +22,11 @@ console.log(`Supabase Key: ${supabaseKey ? 'Loaded' : 'Missing'}`);
 
 // POST route to insert a user
 app.post('/update', async (req, res) => {
+<<<<<<< Updated upstream
   console.log('Incoming Request:', req.body);
 
+=======
+>>>>>>> Stashed changes
   const { email, phone_no, username, password, pass, college_name, amount, count } = req.body;
 
   if (!Array.isArray(pass) || !pass.every(row => Array.isArray(row))) {
@@ -31,6 +34,7 @@ app.post('/update', async (req, res) => {
     return res.status(400).json({ error: 'pass must be a 2D array' });
   }
 
+<<<<<<< Updated upstream
   console.log('Inserting user with data:', { email, phone_no, username, college_name, amount, count });
 
   const { data, error } = await supabase
@@ -41,6 +45,19 @@ app.post('/update', async (req, res) => {
   if (error) {
     console.error('Supabase Insert Error:', error);
     return res.status(500).json({ error: 'Internal server error', details: error });
+=======
+  // Upsert the user into the database
+  const { data, error } = await supabase
+    .from('users')
+    .upsert([
+      { email, phone_no, username, password, pass, college_name, amount, count }
+    ], { onConflict: 'phone_no' }) // Specify the primary key column
+    .select();
+
+  if (error) {
+    console.error('Error upserting user:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+>>>>>>> Stashed changes
   }
 
   console.log('Insert Success:', data);
