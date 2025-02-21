@@ -14,20 +14,19 @@ console.log(supabaseUrl);
 const supabaseKey = process.env.SUPABASE_ANON_KEY; // Your Supabase anon/public key
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Endpoint to create a new user
-app.post('/users', async (req, res) => {
-  const { email, phone_no, username, password, pass } = req.body;
+app.post('/update', async (req, res) => {
+  const { email, phone_no, username, password, pass, college_name } = req.body;
 
   // Validate that 'pass' is a 2D array
   if (!Array.isArray(pass) || !pass.every(row => Array.isArray(row))) {
     return res.status(400).json({ error: 'pass must be a 2D array' });
   }
 
-  // NOTE: In production, hash the password before saving it to the database
+  // Insert the user into the database
   const { data, error } = await supabase
     .from('users')
     .insert([
-      { email, phone_no, username, password, pass }
+      { email, phone_no, username, password, pass, college_name }
     ])
     .select();
 
@@ -39,8 +38,7 @@ app.post('/users', async (req, res) => {
   res.status(201).json(data[0]);
 });
 
-// Endpoint to fetch all users
-app.get('/user', async (req, res) => {
+app.get('/select', async (req, res) => {
   const { data, error } = await supabase
     .from('users')
     .select('*');
@@ -49,7 +47,6 @@ app.get('/user', async (req, res) => {
     console.error('Error fetching users:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-
   res.status(200).json(data);
 });
 
