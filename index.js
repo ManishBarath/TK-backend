@@ -97,6 +97,50 @@ app.put('/update-paid-status', async (req, res) => {
     return res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
+//update the amount
+app.put('/update-amount', async (req, res) => {
+  try {
+    console.log('Update Amount Request:', req.body);
+    const { phone_no, amount } = req.body;
+
+    // Validate required fields
+    if (!phone_no) {
+      return res.status(400).json({ error: 'phone_no is required as an identifier' });
+    }
+
+    if (typeof amount !== 'number' || amount < 0) {
+      return res.status(400).json({ error: 'amount must be a positive number' });
+    }
+
+    console.log(`Updating amount for user with phone_no: ${phone_no} to: ${amount}`);
+
+    // Update only the amount field for the user
+    const { data, error } = await supabase
+      .from('users')
+      .update({ amount })
+      .eq('phone_no', phone_no)
+      .select();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    if (data.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log('Amount updated successfully:', data);
+    return res.status(200).json({
+      success: true,
+      message: `Amount updated to ${amount}`,
+      user: data[0]
+    });
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return res.status(500).json({ error: 'Server error', details: err.message });
+  }
+});
 
 // Update the user's day pass
 app.put('/update-pass', async(req, res) => {
