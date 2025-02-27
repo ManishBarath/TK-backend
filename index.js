@@ -304,6 +304,56 @@ app.get('/u1/:phone', async (req, res) => {
   }
 });
 
+// PUT route to update paid status in u1 table
+app.put('/u1/update-paid-status', async (req, res) => {
+  try {
+    console.log('Update Paid Status Request for u1:', req.body);
+    const { phone, paid } = req.body;
+    
+    // Validate required fields
+    if (!phone) {
+      return res.status(400).json({ error: 'phone is required as identifier' });
+    }
+    
+    // Validate phone number format
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({ error: 'Phone number must be exactly 10 digits' });
+    }
+    
+    if (typeof paid !== 'boolean') {
+      return res.status(400).json({ error: 'paid must be a boolean value (true or false)' });
+    }
+    
+    console.log(`Updating paid status for user with phone: ${phone} to: ${paid}`);
+    
+    // Update only the paid field for the user in u1 table
+    const { data, error } = await supabase
+      .from('u1')
+      .update({ paid })
+      .eq('phone', phone)
+      .select();
+    
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    
+    if (data.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    console.log('Paid status updated successfully in u1:', data);
+    return res.status(200).json({ 
+      success: true, 
+      message: `Paid status updated to ${paid}`,
+      user: data[0]
+    });
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return res.status(500).json({ error: 'Server error', details: err.message });
+  }
+});
 // Route to update user data
 app.put('/u1/:phone', async (req, res) => {
   try {
